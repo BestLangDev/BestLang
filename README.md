@@ -6,7 +6,7 @@
 为了避免 Web 课程成为水课，某人决定 ~~成为偶像~~ 再造一个 PHP 框架。
 
 ## 项目计划
-- [ ] 基本 Controller 支持
+- [x] 基本 Controller 支持
 - [ ] 请求相关方法 (Post / Session / Cookies ...)
 - [ ] 常用数据库 (MySQL / SQLite) 支持
 - [ ] 基本 Model 支持
