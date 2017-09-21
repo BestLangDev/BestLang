@@ -12,9 +12,9 @@ class BLApp
 
     /**
      * 路由方案：
-     * (1) / -> Main.php::main()
-     * (2) /aaa -> Aaa.php::main()
-     * (3) /aaa/bbb/ccc -> aaa/bbb.php::ccc() -> aaa/bbb/Ccc.php::main()
+     * (1) / -> Main.php::index()
+     * (2) /aaa -> Aaa.php::index()
+     * (3) /aaa/bbb/ccc -> aaa/bbb.php::ccc() -> aaa/bbb/Ccc.php::index()
      */
     private static function route()
     {
@@ -23,13 +23,13 @@ class BLApp
         $size = sizeof($path);
         if ($size <= 0) {
             // (1)
-            $class = ucfirst(DEFAULT_NAME);
-            $method = DEFAULT_NAME;
+            $class = ucfirst(DEFAULT_CONTROLLER);
+            $method = DEFAULT_METHOD;
             self::load_controller($class);
         } elseif ($size == 1) {
             // (2)
-            $class = ucfirst($path[0] ?: DEFAULT_NAME);
-            $method = DEFAULT_NAME;
+            $class = ucfirst($path[0] ?: DEFAULT_CONTROLLER);
+            $method = DEFAULT_METHOD;
             self::load_controller($class);
         } else {
             // (3)
@@ -38,7 +38,7 @@ class BLApp
             self::load_controller(join('/', array_slice($path, 0, $size - 2)) . '/' . $class);
             if (!class_exists($class, false) || !method_exists($class, $method)) {
                 $class = ucfirst($path[$size - 1]);
-                $method = DEFAULT_NAME;
+                $method = DEFAULT_METHOD;
                 self::load_controller($filename = join('/', array_slice($path, 0, $size - 1)) . '/' . $class);
             }
         }
@@ -48,7 +48,7 @@ class BLApp
             return; // TODO 500
         }
         BLLog::log('Calling ' . $class . '::' . $method);
-        echo call_user_func([$class, $method]);
+        echo call_user_func([new $class(), $method]);
     }
 
     private static function load_controller($filename)

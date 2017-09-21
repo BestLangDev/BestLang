@@ -4,7 +4,7 @@ use bestlang\core\BLController;
 
 class Test extends BLController
 {
-    public function main()
+    public function index()
     {
         echo 'Hello World!';
     }

@@ -4,7 +4,7 @@ use bestlang\core\BLController;
 
 class Main extends BLController
 {
-    public function main()
+    public function index()
     {
         return 'Hello BestLang!';
     }
