@@ -2,7 +2,10 @@
 
 namespace bestlang\core;
 
-
+/**
+ * 应用程序类
+ * @package bestlang\core
+ */
 class BLApp
 {
     public static function start()
@@ -44,11 +47,12 @@ class BLApp
         }
         // check again
         if (!class_exists($class, false) || !method_exists($class, $method)) {
-            BLLog::log('Cannot find callable ' . $class . '::' . $method);
+            BLLog::log('Cannot find callable for path ' . $_SERVER['PATH_INFO']);
             return; // TODO 500
         }
         BLLog::log('Calling ' . $class . '::' . $method);
-        echo call_user_func([new $class(), $method]);
+        $controller = new $class();
+        echo call_user_func([$controller, $method]);
     }
 
     private static function load_controller($filename)

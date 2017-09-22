@@ -22,5 +22,5 @@ spl_autoload_register(function ($class) {
 });
 
 // 真正启动应用
-bestlang\core\BLLog::log('[' . $_SERVER['REQUEST_METHOD'] . '] ' . $_SERVER['REQUEST_URI']);
-bestlang\core\BLApp::start();
+\bestlang\core\BLLog::log('[' . $_SERVER['REQUEST_METHOD'] . '] ' . $_SERVER['REQUEST_URI']);
+\bestlang\core\BLApp::start();
