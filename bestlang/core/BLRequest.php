@@ -3,55 +3,86 @@
 namespace bestlang\core;
 
 
-class BLRequest extends Singleton
+class BLRequest
 {
-    public function method()
+    /**
+     * @return string 请求方法
+     */
+    public static function method()
     {
         return $_SERVER['REQUEST_METHOD'];
     }
 
-    public function host()
+    /**
+     * @return string 主机名
+     */
+    public static function host()
     {
         return $_SERVER['HTTP_HOST'];
     }
 
-    public function fullPath()
+    /**
+     * @return string 请求完全路径（包含查询字符串）
+     */
+    public static function fullPath()
     {
         return $_SERVER['REQUEST_URI'];
     }
 
-    public function realPath()
+    /**
+     * @return string 请求真实路径
+     */
+    public static function realPath()
     {
         return $_SERVER['PATH_INFO'];
     }
 
-    public function queryStr()
+    /**
+     * @return string 查询字符串
+     */
+    public static function queryStr()
     {
         return $_SERVER['QUERY_STRING'];
     }
 
-    public function headers()
+    /**
+     * @return array 全部请求头
+     */
+    public static function headers()
     {
         return getallheaders();
     }
 
-    public function body()
+    /**
+     * @return mixed 请求体
+     */
+    public static function body()
     {
         return file_get_contents('php://input');
     }
 
-    private function getOrDefault($map, $key, $default = null)
+    private static function getOrDefault($map, $key, $default)
     {
         return isset($map[$key]) ? $map[$key] : $default;
     }
 
-    public function get($key, $default = null)
+    /**
+     * @param string $key 参数名
+     * @param mixed $default 默认值
+     * @return mixed GET 参数
+     */
+    public static function get($key, $default = null)
     {
-        return $this->getOrDefault($_GET, $key, $default);
+        return self::getOrDefault($_GET, $key, $default);
     }
 
-    public function post($key, $default = null)
+    /**
+     * @param string $key 参数名
+     * @param mixed $default 默认值
+     * @return mixed POST 参数
+     */
+    public static function post($key, $default = null)
     {
-        return $this->getOrDefault($_POST, $key, $default);
+        return self::getOrDefault($_POST, $key, $default);
     }
 }

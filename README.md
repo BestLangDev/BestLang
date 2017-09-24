@@ -7,7 +7,7 @@
 
 ## 项目计划
 - [x] 基本 Controller 支持
-- [ ] 请求相关方法 (Post / Session / Cookies ...)
+- [x] 请求相关方法 (Post / Session / Cookies ...)
 - [ ] 常用数据库 (MySQL / SQLite) 支持
 - [ ] 基本 Model 支持
 - [ ] 基本 View 层支持 (集成第三方模板引擎)

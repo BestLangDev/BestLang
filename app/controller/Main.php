@@ -6,6 +6,6 @@ class Main extends BLController
 {
     public function index()
     {
-        return 'Hello BestLang! ' . $this->request()->get('test');
+        return 'Hello BestLang!';
     }
 }

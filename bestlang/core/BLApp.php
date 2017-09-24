@@ -38,11 +38,11 @@ class BLApp
             // (3)
             $class = ucfirst($path[$size - 2]);
             $method = $path[$size - 1];
-            self::load_controller(join('/', array_slice($path, 0, $size - 2)) . '/' . $class);
+            self::load_controller(strtolower(join('/', array_slice($path, 0, $size - 2))) . '/' . $class);
             if (!class_exists($class, false) || !method_exists($class, $method)) {
                 $class = ucfirst($path[$size - 1]);
                 $method = DEFAULT_METHOD;
-                self::load_controller($filename = join('/', array_slice($path, 0, $size - 1)) . '/' . $class);
+                self::load_controller($filename = strtolower(join('/', array_slice($path, 0, $size - 1))) . '/' . $class);
             }
         }
         // check again
