@@ -48,11 +48,20 @@ class BLApp
         // check again
         if (!class_exists($class, false) || !method_exists($class, $method)) {
             BLLog::log('Cannot find callable for path ' . $_SERVER['PATH_INFO']);
+            echo 'Error';
             return; // TODO 500
         }
+
         BLLog::log('Calling ' . $class . '::' . $method);
         $controller = new $class();
-        echo call_user_func([$controller, $method]);
+        $response = call_user_func([$controller, $method]);
+        if (is_a($response, BLResponse::class)) {
+            http_response_code($response->getStatus());
+            header('Content-Type:' . $response->getContentType());
+            echo $response->getBody();
+        } else {
+            echo $response;
+        }
     }
 
     private static function load_controller($filename)

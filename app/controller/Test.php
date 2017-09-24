@@ -6,25 +6,32 @@ use bestlang\core\BLSession;
 
 class Test extends BLController
 {
-    public function cookie()
+    public function testcookie()
     {
         $cookie_key = 'test_cookie';
-        $ret = 'Current value: ' . BLCookie::get($cookie_key) . '<br>';
+        $ret = 'Current value: ' . $this->cookie($cookie_key) . '<br>';
         $new_value = time();
-        BLCookie::set($cookie_key, $new_value);
+        $this->cookie($cookie_key, $new_value);
         $ret .= 'Set to: ' . $new_value . '<br>';
-        $ret .= 'Get again: ' . BLCookie::get($cookie_key);
-        return $ret;
+        $ret .= 'Get again: ' . $this->cookie($cookie_key);
+        return $this->html($ret);
     }
 
-    public function session()
+    public function testsession()
     {
         $session_key = 'test_session';
-        $ret = 'Current value: ' . BLSession::get($session_key) . '<br>';
+        $ret = 'Current value: ' . $this->session($session_key) . '<br>';
         $new_value = time();
-        BLSession::set($session_key, $new_value);
+        $this->session($session_key, $new_value);
         $ret .= 'Set to: ' . $new_value . '<br>';
-        $ret .= 'Get again: ' . BLSession::get($session_key);
-        return $ret;
+        $ret .= 'Get again: ' . $this->session($session_key);
+        return $this->html($ret);
+    }
+
+    public function testjson()
+    {
+        return $this->json([
+            'a' => 1, 'b' => true, 'c' => 'test'
+        ]);
     }
 }
