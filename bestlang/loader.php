@@ -14,11 +14,22 @@ define('DEFAULT_METHOD', 'index');
 
 // 注册类加载器
 spl_autoload_register(function ($class) {
-    if (strpos($class, 'bestlang\\') !== 0) {
-        return false;
+    file_put_contents('php://stdout', 'Loading class ' . $class . "\n");
+    // 根据 namespace 搜索
+    if (strpos($class, 'bestlang\\') === 0) {
+        return include_once BL_ROOT . substr($class, 9) . '.php';
     }
-    $file = substr($class, 9);
-    return require_once BL_ROOT . $file . '.php';
+    if (strpos($class, 'app\\') === 0) {
+        return include_once APP_ROOT . substr($class, 4) . '.php';
+    }
+    // 自动查找
+    if (file_exists(APP_CONTROLLER_DIR . $class . '.php')) {
+        return include_once APP_CONTROLLER_DIR . $class . '.php';
+    }
+    if (file_exists(APP_MODEL_DIR . $class . '.php')) {
+        return include_once APP_MODEL_DIR . $class . '.php';
+    }
+    return false;
 });
 
 // 真正启动应用

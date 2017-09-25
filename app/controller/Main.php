@@ -1,5 +1,7 @@
 <?php
 
+namespace app\controller;
+
 use bestlang\core\BLController;
 
 class Main extends BLController

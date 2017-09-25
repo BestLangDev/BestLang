@@ -21,51 +21,67 @@ class BLApp
      */
     private static function route()
     {
-        $path = explode('/', trim($_SERVER['PATH_INFO'], '/'));
-        // BLLog::log(var_export($path, true));
+        $path = isset($_SERVER['PATH_INFO']) ? explode('/', trim($_SERVER['PATH_INFO'], '/')) : [];
+        BLLog::log(var_export($path, true));
         $size = sizeof($path);
         if ($size <= 0) {
             // (1)
-            $class = ucfirst(DEFAULT_CONTROLLER);
-            $method = DEFAULT_METHOD;
-            self::load_controller($class);
+            $result = self::tryInvoke(DEFAULT_CONTROLLER, DEFAULT_METHOD);
         } elseif ($size == 1) {
             // (2)
-            $class = ucfirst($path[0] ?: DEFAULT_CONTROLLER);
-            $method = DEFAULT_METHOD;
-            self::load_controller($class);
+            $result = self::tryInvoke($path[0] ?: DEFAULT_CONTROLLER, DEFAULT_METHOD);
         } else {
             // (3)
-            $class = ucfirst($path[$size - 2]);
-            $method = $path[$size - 1];
-            self::load_controller(strtolower(join('/', array_slice($path, 0, $size - 2))) . '/' . $class);
-            if (!class_exists($class, false) || !method_exists($class, $method)) {
-                $class = ucfirst($path[$size - 1]);
-                $method = DEFAULT_METHOD;
-                self::load_controller($filename = strtolower(join('/', array_slice($path, 0, $size - 1))) . '/' . $class);
+            $result = self::tryInvoke($path[$size - 2], $path[$size - 1], join('/', array_slice($path, 0, $size - 2)));
+            if (is_null($result)) {
+                $result = self::tryInvoke($path[$size - 1], DEFAULT_METHOD, join('/', array_slice($path, 0, $size - 1)));
             }
         }
         // check again
-        if (!class_exists($class, false) || !method_exists($class, $method)) {
-            BLLog::log('Cannot find callable for path ' . $_SERVER['PATH_INFO']);
+        if (is_null($result)) {
+            BLLog::log('Cannot find callable for path ' . $_SERVER['REQUEST_URI']);
             echo 'Error';
             return; // TODO 500
         }
-
-        BLLog::log('Calling ' . $class . '::' . $method);
-        $controller = new $class();
-        $response = call_user_func([$controller, $method]);
-        if (is_a($response, BLResponse::class)) {
-            http_response_code($response->getStatus());
-            header('Content-Type:' . $response->getContentType());
-            echo $response->getBody();
+        // output
+        if (is_a($result, BLResponse::class)) {
+            http_response_code($result->getStatus());
+            header('Content-Type:' . $result->getContentType());
+            echo $result->getBody();
         } else {
-            echo $response;
+            echo $result;
         }
     }
 
     private static function load_controller($filename)
     {
         include_once APP_CONTROLLER_DIR . $filename . '.php';
+    }
+
+    private static function tryInvoke($controller, $method, $path = '')
+    {
+        $class = ucfirst($controller);
+        $rClass = self::getClass('app\\controller\\' . ($path ? $path . '\\' : '') . $class);
+        if (is_null($rClass)) {
+            return null;
+        }
+        try {
+            $method = $rClass->getMethod($method);
+            if (!$method->isPublic()) {
+                return null;
+            }
+            return $method->invoke($rClass->newInstance());
+        } catch (\ReflectionException $e) {
+            return null;
+        }
+    }
+
+    private static function getClass($class)
+    {
+        try {
+            return new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return null;
+        }
     }
 }

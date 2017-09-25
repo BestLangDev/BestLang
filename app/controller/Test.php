@@ -1,8 +1,8 @@
 <?php
 
+namespace app\controller;
+
 use bestlang\core\BLController;
-use bestlang\core\BLCookie;
-use bestlang\core\BLSession;
 
 class Test extends BLController
 {
