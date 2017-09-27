@@ -2,7 +2,7 @@
 
 namespace app\controller;
 
-use bestlang\core\BLController;
+use bestlang\core\controller\BLController;
 
 class Main extends BLController
 {

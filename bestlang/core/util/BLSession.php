@@ -1,7 +1,6 @@
 <?php
 
-namespace bestlang\core;
-
+namespace bestlang\core\util;
 
 class BLSession
 {

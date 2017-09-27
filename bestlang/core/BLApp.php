@@ -2,6 +2,8 @@
 
 namespace bestlang\core;
 
+use bestlang\core\util\BLResponse;
+
 /**
  * 应用程序类
  * @package bestlang\core
@@ -38,7 +40,7 @@ class BLApp
             }
         }
         // check again
-        if (is_null($result)) {
+        if ($result === false) {
             BLLog::log('Cannot find callable for path ' . $_SERVER['REQUEST_URI']);
             echo 'Error';
             return; // TODO 500
@@ -63,16 +65,16 @@ class BLApp
         $class = ucfirst($controller);
         $rClass = self::getClass('app\\controller\\' . ($path ? $path . '\\' : '') . $class);
         if (is_null($rClass)) {
-            return null;
+            return false;
         }
         try {
             $method = $rClass->getMethod($method);
             if (!$method->isPublic()) {
-                return null;
+                return false;
             }
             return $method->invoke($rClass->newInstance());
         } catch (\ReflectionException $e) {
-            return null;
+            return false;
         }
     }
 
