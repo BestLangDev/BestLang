@@ -42,14 +42,17 @@ class BLApp
         // check again
         if ($result === false) {
             BLLog::log('Cannot find callable for path ' . $_SERVER['REQUEST_URI']);
-            echo 'Error';
-            return; // TODO 500
+            http_response_code(404);
+            echo 'Not Found';
         }
         // output
         if (is_a($result, BLResponse::class)) {
             http_response_code($result->getStatus());
             header('Content-Type:' . $result->getContentType());
             echo $result->getBody();
+        } elseif (is_a($result, \Exception::class)) {
+            http_response_code(500);
+            var_dump($result);
         } else {
             echo $result;
         }
@@ -72,7 +75,11 @@ class BLApp
             if (!$method->isPublic()) {
                 return false;
             }
-            return $method->invoke($rClass->newInstance());
+            try {
+                return $method->invoke($rClass->newInstance());
+            } catch (\Exception $e) {
+                return $e;
+            }
         } catch (\ReflectionException $e) {
             return false;
         }

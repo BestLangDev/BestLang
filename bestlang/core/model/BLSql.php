@@ -17,6 +17,7 @@ class BLSql
         if (!isset(self::$_dbhnd)) {
             try {
                 self::$_dbhnd = new \PDO(DBConfig::$dsn, DBConfig::$user, DBConfig::$pass);
+                self::$_dbhnd->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             } catch (\PDOException $e) {
             }
         }
@@ -24,12 +25,12 @@ class BLSql
     }
 
     /**
-     * 执行 SQL 查询
+     * 执行 SQL 语句
      * @param string $sql SQL 语句
      * @param array $params 绑定参数
-     * @return mixed 查询结果
+     * @return \PDOStatement 执行结果
      */
-    public static function query($sql, $params = [])
+    public static function exec($sql, $params = [])
     {
         $stmt = self::getHandle()->prepare($sql);
         $stmt->execute($params);
