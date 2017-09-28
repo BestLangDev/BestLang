@@ -3,6 +3,7 @@
 namespace bestlang\core\model;
 
 use app\config\DBConfig;
+use bestlang\core\BLLog;
 
 class BLSql
 {
@@ -32,6 +33,8 @@ class BLSql
      */
     public static function exec($sql, $params = [])
     {
+        BLLog::log('[SQL] ' . $sql);
+        BLLog::log('[Params] ' . var_export($params, true));
         $stmt = self::getHandle()->prepare($sql);
         $stmt->execute($params);
         return $stmt;

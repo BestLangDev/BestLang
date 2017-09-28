@@ -19,6 +19,88 @@ class BLModel
      */
     protected static $pkfield;
 
+    /**
+     * @var array 数据
+     */
+    private $data;
+
+    /**
+     * @var mixed 主键值
+     */
+    private $pkValue;
+
+    /**
+     * BLModel constructor.
+     * @param array $data
+     */
+    public function __construct($data = null)
+    {
+        if (isset($data)) {
+            $this->data($data);
+        }
+    }
+
+    // ========== 实例方法 ==========
+
+    /**
+     * 获取 / 设置实例数据
+     * @param array $data
+     * @return array|bool
+     */
+    public function data($data = null)
+    {
+        if (isset($data)) {
+            if (is_array($data)) {
+                foreach (self::fields() as $field) {
+                    if (isset($data[$field])) {
+                        $this->data[$field] = $data[$field];
+                    }
+                }
+                return true;
+            }
+            return false;
+        } else {
+            return $this->data;
+        }
+    }
+
+    /**
+     * 将模型写入数据库
+     */
+    public function save()
+    {
+        if (isset($this->pkValue)) {
+            // Update
+            $quests = [];
+            $params = [];
+            foreach ($this->data as $field => $value) {
+                if ($field != self::pkfield()) {
+                    $quests[] = '`' . $field . '`=?';
+                    $params[] = $value;
+                }
+            }
+            $sql = 'UPDATE `' . self::table() . '` SET ' . join(',', $quests) . ' WHERE `' . self::pkfield() . '`=?;';
+            $params[] = $this->pkValue;
+            return BLSql::exec($sql, $params)->rowCount();
+        } else {
+            // Insert
+            $fields = [];
+            $quests = [];
+            $params = [];
+            foreach ($this->data as $field => $value) {
+                $fields[] = '`' . $field . '`';
+                $quests[] = '?';
+                $params[] = $value;
+            }
+            $sql = 'INSERT INTO `' . self::table() . '` (' . join(',', $fields) . ') VALUES (' . join(',', $quests) . ');';
+            BLSql::exec($sql, $params);
+            // save pk value
+            $this->pkValue = BLSql::getHandle()->lastInsertId(self::pkfield());
+            $this->data[self::pkfield()] = $this->pkValue;
+            return $this->pkValue;
+        }
+    }
+
     // ========== 表信息相关方法 ==========
 
     /**
@@ -74,21 +156,11 @@ class BLModel
         return static::$fields;
     }
 
-    // ========== CRUD 相关方法 ==========
+    // ========== 便捷方法 ==========
 
     public static function insert($data = [])
     {
-        $realData = self::filterData($data);
-        $fields = [];
-        $quests = [];
-        $params = [];
-        foreach ($realData as $field => $value) {
-            $fields[] = '`' . $field . '`';
-            $quests[] = '?';
-            $params[] = $value;
-        }
-        $sql = 'INSERT INTO `' . self::table() . '` (' . join(',', $fields) . ') VALUES (' . join(',', $quests) . ');';
-        return BLSql::exec($sql, $params);
+        return (new static($data))->save();
     }
 
     public static function delete($pk)
@@ -98,18 +170,5 @@ class BLModel
         }
         $sql = 'DELETE FROM `' . self::table() . '` WHERE `' . self::pkfield() . '` = ?;';
         return BLSql::exec($sql, [$pk]);
-    }
-
-    private static function filterData($src = [])
-    {
-        $result = [];
-        if (is_array($src)) {
-            foreach (self::fields() as $field) {
-                if (isset($src[$field])) {
-                    $result[$field] = $src[$field];
-                }
-            }
-        }
-        return $result;
     }
 }

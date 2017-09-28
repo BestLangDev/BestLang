@@ -9,12 +9,19 @@ class ModelTest extends BLController
 {
     public function testinsert()
     {
-        \app\model\Test::insert([
+        $obj = new \app\model\Test();
+        $obj->data([
             'strcol' => 'test',
             'intcol' => 2333,
             'notexist' => 'test'
         ]);
-        return $this->html('Success');
+        $id = $obj->save();
+        $obj->data([
+            'intcol' => 6666,
+            'dtcol' => '2017/01/01'
+        ]);
+        $obj->save();
+        return $this->html('Success, id = ' . $id);
     }
 
     public function testdelete()
