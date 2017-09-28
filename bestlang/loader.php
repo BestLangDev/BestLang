@@ -15,11 +15,13 @@ define('DEFAULT_METHOD', 'index');
 // 注册类加载器
 spl_autoload_register(function ($class) {
     file_put_contents('php://stdout', 'Loading class ' . $class . "\n");
+    // 适配 Unix
+    $class = str_replace('\\', '/', $class);
     // 根据 namespace 搜索
-    if (strpos($class, 'bestlang\\') === 0) {
+    if (strpos($class, 'bestlang/') === 0) {
         return include_once BL_ROOT . substr($class, 9) . '.php';
     }
-    if (strpos($class, 'app\\') === 0) {
+    if (strpos($class, 'app/') === 0) {
         return include_once APP_ROOT . substr($class, 4) . '.php';
     }
     // 自动查找
