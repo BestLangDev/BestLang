@@ -17,7 +17,7 @@ class BLModel
     /**
      * @var string 主键列名
      */
-    protected static $pkfield;
+    protected static $pkField;
 
     /**
      * @var array 数据
@@ -38,6 +38,16 @@ class BLModel
         if (isset($data)) {
             $this->data($data);
         }
+    }
+
+    public function __get($name)
+    {
+        return $this->data[strtolower($name)];
+    }
+
+    public function __set($name, $value)
+    {
+        $this->data([strtolower($name) => $value]);
     }
 
     // ========== 实例方法 ==========
@@ -74,12 +84,12 @@ class BLModel
             $quests = [];
             $params = [];
             foreach ($this->data as $field => $value) {
-                if ($field != self::pkfield()) {
+                if ($field != self::pkField()) {
                     $quests[] = '`' . $field . '`=?';
                     $params[] = $value;
                 }
             }
-            $sql = 'UPDATE `' . self::table() . '` SET ' . join(',', $quests) . ' WHERE `' . self::pkfield() . '`=?;';
+            $sql = 'UPDATE `' . self::table() . '` SET ' . join(',', $quests) . ' WHERE `' . self::pkField() . '`=?;';
             $params[] = $this->pkValue;
             return BLSql::exec($sql, $params)->rowCount();
         } else {
@@ -95,9 +105,18 @@ class BLModel
             $sql = 'INSERT INTO `' . self::table() . '` (' . join(',', $fields) . ') VALUES (' . join(',', $quests) . ');';
             BLSql::exec($sql, $params);
             // save pk value
-            $this->pkValue = BLSql::getHandle()->lastInsertId(self::pkfield());
-            $this->data[self::pkfield()] = $this->pkValue;
+            $this->pkValue = BLSql::getHandle()->lastInsertId(self::pkField());
+            $this->data[self::pkField()] = $this->pkValue;
             return $this->pkValue;
+        }
+    }
+
+    private function autoPkValue($value = null)
+    {
+        if (isset($value)) {
+            $this->pkValue = $value;
+        } else {
+            $this->pkValue = $this->data[self::pkField()];
         }
     }
 
@@ -134,29 +153,54 @@ class BLModel
      * 获取该 Model 主键列名
      * @return string|false
      */
-    public static function pkfield()
+    public static function pkField()
     {
-        if (!isset(static::$pkfield)) {
+        if (!isset(static::$pkField)) {
             self::getTableInfo();
         }
-        return static::$pkfield;
+        return static::$pkField;
     }
 
     private static function getTableInfo()
     {
         $sql = 'SHOW COLUMNS FROM ' . self::table() . ';';
         static::$fields = [];
-        static::$pkfield = false;
+        static::$pkField = false;
         foreach (BLSql::exec($sql)->fetchAll() as $row) {
-            static::$fields[] = $row['Field'];
+            static::$fields[] = strtolower($row['Field']);
             if (strtolower($row['Key']) == 'pri') {
-                static::$pkfield = $row['Field'];
+                static::$pkField = $row['Field'];
             }
         }
         return static::$fields;
     }
 
     // ========== 便捷方法 ==========
+
+    public static function get($pk)
+    {
+        if (empty(self::pkField())) {
+            return false;
+        }
+        $sql = 'SELECT * FROM `' . self::table() . '` WHERE `' . self::pkField() . '`=?;';
+        $result = BLSql::exec($sql, [$pk]);
+        $model = new static($result->fetch(\PDO::FETCH_ASSOC));
+        $model->autoPkValue();
+        return $model;
+    }
+
+    public static function all()
+    {
+        $sql = 'SELECT * FROM `' . self::table() . '`;';
+        $result = BLSql::exec($sql);
+        $models = [];
+        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
+            $model = new static($row);
+            $model->autoPkValue();
+            $models[] = $model;
+        }
+        return $models;
+    }
 
     public static function insert($data = [])
     {
@@ -165,10 +209,10 @@ class BLModel
 
     public static function delete($pk)
     {
-        if (empty(self::pkfield())) {
+        if (empty(self::pkField())) {
             return false;
         }
-        $sql = 'DELETE FROM `' . self::table() . '` WHERE `' . self::pkfield() . '` = ?;';
-        return BLSql::exec($sql, [$pk]);
+        $sql = 'DELETE FROM `' . self::table() . '` WHERE `' . self::pkField() . '` = ?;';
+        return BLSql::exec($sql, [$pk])->rowCount();
     }
 }

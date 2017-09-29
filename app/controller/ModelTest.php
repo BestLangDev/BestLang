@@ -7,6 +7,16 @@ use bestlang\core\util\BLRequest;
 
 class ModelTest extends BLController
 {
+    public function testget()
+    {
+        var_dump(\app\model\Test::get(BLRequest::get('id')));
+    }
+
+    public function testall()
+    {
+        var_dump(\app\model\Test::all()[0]->strCol);
+    }
+
     public function testinsert()
     {
         $obj = new \app\model\Test();
@@ -17,9 +27,9 @@ class ModelTest extends BLController
         ]);
         $id = $obj->save();
         $obj->data([
-            'intcol' => 6666,
-            'dtcol' => '2017/01/01'
+            'intcol' => 6666
         ]);
+        $obj->dtcol = '2017/01/01';
         $obj->save();
         return $this->html('Success, id = ' . $id);
     }
