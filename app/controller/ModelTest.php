@@ -14,7 +14,7 @@ class ModelTest extends BLController
 
     public function testall()
     {
-        var_dump(\app\model\Test::all()[0]->strCol);
+        var_dump(\app\model\Test::all());
     }
 
     public function testinsert()

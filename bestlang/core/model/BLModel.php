@@ -22,12 +22,17 @@ class BLModel
     /**
      * @var array 数据
      */
-    private $data;
+    private $_data;
+
+    /**
+     * @var array 修改标记
+     */
+    private $_dirty;
 
     /**
      * @var mixed 主键值
      */
-    private $pkValue;
+    private $_pkValue;
 
     /**
      * BLModel constructor.
@@ -42,7 +47,7 @@ class BLModel
 
     public function __get($name)
     {
-        return $this->data[strtolower($name)];
+        return $this->_data[strtolower($name)];
     }
 
     public function __set($name, $value)
@@ -63,76 +68,71 @@ class BLModel
             if (is_array($data)) {
                 foreach (self::fields() as $field) {
                     if (isset($data[$field])) {
-                        $this->data[$field] = $data[$field];
+                        $this->_data[$field] = $data[$field];
+                        $this->_dirty[$field] = true;
                     }
                 }
                 return true;
             }
             return false;
         } else {
-            return $this->data;
+            return $this->_data;
         }
     }
 
     /**
      * 将模型写入数据库
+     * @return int 若为插入，返回新主键值；若为更新，返回受影响行数
      */
     public function save()
     {
-        if (isset($this->pkValue)) {
+        if (isset($this->_pkValue)) {
             // Update
             $quests = [];
             $params = [];
-            foreach ($this->data as $field => $value) {
+            foreach ($this->_dirty as $field => $_) {
                 if ($field != self::pkField()) {
                     $quests[] = '`' . $field . '`=?';
-                    $params[] = $value;
+                    $params[] = $this->_data[$field];
                 }
             }
             $sql = 'UPDATE `' . self::table() . '` SET ' . join(',', $quests) . ' WHERE `' . self::pkField() . '`=?;';
-            $params[] = $this->pkValue;
-            return BLSql::exec($sql, $params)->rowCount();
+            $params[] = $this->_pkValue;
+            $result = BLSql::exec($sql, $params)->rowCount();
+            if ($result > 0) {
+                $this->_dirty = [];
+            }
+            return $result;
         } else {
             // Insert
             $fields = [];
             $quests = [];
             $params = [];
-            foreach ($this->data as $field => $value) {
+            foreach ($this->_data as $field => $value) {
                 $fields[] = '`' . $field . '`';
                 $quests[] = '?';
                 $params[] = $value;
             }
             $sql = 'INSERT INTO `' . self::table() . '` (' . join(',', $fields) . ') VALUES (' . join(',', $quests) . ');';
             BLSql::exec($sql, $params);
+            $this->_dirty = [];
             // save pk value
-            $this->pkValue = BLSql::getHandle()->lastInsertId(self::pkField());
-            $this->data[self::pkField()] = $this->pkValue;
-            return $this->pkValue;
+            $this->_pkValue = BLSql::getHandle()->lastInsertId(self::pkField());
+            $this->_data[self::pkField()] = $this->_pkValue;
+            return $this->_pkValue;
         }
     }
 
-    private function autoPkValue($value = null)
+    private function setPkValue($value = null)
     {
         if (isset($value)) {
-            $this->pkValue = $value;
+            $this->_pkValue = $value;
         } else {
-            $this->pkValue = $this->data[self::pkField()];
+            $this->_pkValue = $this->_data[self::pkField()];
         }
     }
 
     // ========== 表信息相关方法 ==========
-
-    /**
-     * 获取该 Model 的表名
-     * @return string
-     */
-    public static function table()
-    {
-        if (!isset(static::$table)) {
-            static::$table = strtolower((new \ReflectionClass(static::class))->getShortName());
-        }
-        return static::$table;
-    }
 
     /**
      * 获取该 Model 的所有列，或手工指定使用的列
@@ -150,10 +150,22 @@ class BLModel
     }
 
     /**
+     * 获取该 Model 的表名
+     * @return string
+     */
+    private static function table()
+    {
+        if (!isset(static::$table)) {
+            static::$table = strtolower((new \ReflectionClass(static::class))->getShortName());
+        }
+        return static::$table;
+    }
+
+    /**
      * 获取该 Model 主键列名
      * @return string|false
      */
-    public static function pkField()
+    private static function pkField()
     {
         if (!isset(static::$pkField)) {
             self::getTableInfo();
@@ -185,7 +197,7 @@ class BLModel
         $sql = 'SELECT * FROM `' . self::table() . '` WHERE `' . self::pkField() . '`=?;';
         $result = BLSql::exec($sql, [$pk]);
         $model = new static($result->fetch(\PDO::FETCH_ASSOC));
-        $model->autoPkValue();
+        $model->setPkValue();
         return $model;
     }
 
@@ -196,7 +208,7 @@ class BLModel
         $models = [];
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
             $model = new static($row);
-            $model->autoPkValue();
+            $model->setPkValue();
             $models[] = $model;
         }
         return $models;
