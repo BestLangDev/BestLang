@@ -46,11 +46,11 @@ class BLApp
             echo 'Not Found';
         }
         // output
-        if (is_a($result, BLResponse::class)) {
+        if ($result instanceof BLResponse) {
             http_response_code($result->getStatus());
             header('Content-Type:' . $result->getContentType());
             echo $result->getBody();
-        } elseif (is_a($result, \Exception::class)) {
+        } elseif ($result instanceof \Exception) {
             http_response_code(500);
             var_dump($result);
         } else {

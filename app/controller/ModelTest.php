@@ -17,6 +17,16 @@ class ModelTest extends BLController
         var_dump(\app\model\Test::all());
     }
 
+    public function testquery()
+    {
+        $models = \app\model\Test::query()->where('id', '<', 10)->whereOp('strcol', 'is not null')->orderBy('id desc')->orderBy('intcol')->get();
+        var_dump($models);
+        foreach ($models as $model) {
+            $model->intcol = time();
+            $model->save();
+        }
+    }
+
     public function testinsert()
     {
         $obj = new \app\model\Test();

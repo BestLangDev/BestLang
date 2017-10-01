@@ -8,10 +8,11 @@
 ## 项目计划
 - [x] 基本 Controller 支持
 - [x] 请求相关方法 (Post / Session / Cookies ...)
-- [ ] 常用数据库 (MySQL / SQLite) 支持
-- [ ] 基本 Model 支持
+- [x] 常用数据库 (MySQL / SQLite) 支持
+- [x] 基本 Model 支持
 - [ ] 基本 View 层支持 (集成第三方模板引擎)
 - [ ] 自定义 URL 路由
 - [ ] 常用缓存 (Redis / Memcached / WinCache) 支持
+- [ ] 高级 Model 支持 (关联 / 映射 / 聚合 ...)
 - [ ] 日志支持
 - [ ] 集成 [AutumnRPC](https://github.com/DeepAQ/Autumn/tree/master/autumn-rpc) 客户端

@@ -27,7 +27,7 @@ class BLModel
     /**
      * @var array 修改标记
      */
-    private $_dirty;
+    private $_dirty = [];
 
     /**
      * @var mixed 主键值
@@ -37,11 +37,15 @@ class BLModel
     /**
      * BLModel constructor.
      * @param array $data
+     * @param bool $setPkValue
      */
-    public function __construct($data = null)
+    public function __construct($data = null, $setPkValue = false)
     {
         if (isset($data)) {
-            $this->data($data);
+            $this->data($data, false);
+            if ($setPkValue) {
+                $this->_pkValue = $this->_data[self::pkField()];
+            }
         }
     }
 
@@ -60,16 +64,19 @@ class BLModel
     /**
      * 获取 / 设置实例数据
      * @param array $data
+     * @param bool $setDirty
      * @return array|bool
      */
-    public function data($data = null)
+    public function data($data = null, $setDirty = true)
     {
         if (isset($data)) {
             if (is_array($data)) {
                 foreach (self::fields() as $field) {
                     if (isset($data[$field])) {
                         $this->_data[$field] = $data[$field];
-                        $this->_dirty[$field] = true;
+                        if ($setDirty) {
+                            $this->_dirty[$field] = true;
+                        }
                     }
                 }
                 return true;
@@ -120,15 +127,6 @@ class BLModel
             $this->_pkValue = BLSql::getHandle()->lastInsertId(self::pkField());
             $this->_data[self::pkField()] = $this->_pkValue;
             return $this->_pkValue;
-        }
-    }
-
-    private function setPkValue($value = null)
-    {
-        if (isset($value)) {
-            $this->_pkValue = $value;
-        } else {
-            $this->_pkValue = $this->_data[self::pkField()];
         }
     }
 
@@ -194,24 +192,25 @@ class BLModel
         if (empty(self::pkField())) {
             return false;
         }
-        $sql = 'SELECT * FROM `' . self::table() . '` WHERE `' . self::pkField() . '`=?;';
+        $sql = 'SELECT ' . join(',', self::fields()) . ' FROM `' . self::table() . '` WHERE `' . self::pkField() . '`=?;';
         $result = BLSql::exec($sql, [$pk]);
-        $model = new static($result->fetch(\PDO::FETCH_ASSOC));
-        $model->setPkValue();
-        return $model;
+        return new static($result->fetch(\PDO::FETCH_ASSOC), true);
     }
 
     public static function all()
     {
-        $sql = 'SELECT * FROM `' . self::table() . '`;';
+        $sql = 'SELECT ' . join(',', self::fields()) . ' FROM `' . self::table() . '`;';
         $result = BLSql::exec($sql);
         $models = [];
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-            $model = new static($row);
-            $model->setPkValue();
-            $models[] = $model;
+            $models[] = new static($row, true);
         }
         return $models;
+    }
+
+    public static function query()
+    {
+        return new BLQuery(static::class, self::table(), self::fields());
     }
 
     public static function insert($data = [])
