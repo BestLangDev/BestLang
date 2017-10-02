@@ -16,6 +16,8 @@ class BLQuery
 
     private $orders = [];
 
+    private $limit;
+
     /**
      * BLQuery constructor.
      * @param $model
@@ -37,6 +39,9 @@ class BLQuery
         }
         if (!empty($this->orders)) {
             $sql .= ' ORDER BY ' . join(', ', $this->orders);
+        }
+        if (!empty($this->limit)) {
+            $sql .= ' LIMIT ' . $this->limit;
         }
         $result = BLSql::exec($sql, $this->params);
         $models = [];
@@ -82,5 +87,14 @@ class BLQuery
     {
         $this->orders[] = $order;
         return $this;
+    }
+
+    public function limit($start, $end = null)
+    {
+        if (is_null($end)) {
+            $this->limit = $start;
+        } else {
+            $this->limit = $start . ',' . $end;
+        }
     }
 }
