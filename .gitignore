@@ -14,3 +14,7 @@
 
 # IntelliJ
 out/
+
+# Composer
+composer.lock
+*.phar

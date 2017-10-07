@@ -10,4 +10,10 @@ class Main extends BLController
     {
         return 'Hello BestLang!';
     }
+
+    public function phpinfo()
+    {
+        phpinfo();
+        return true;
+    }
 }
