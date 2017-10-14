@@ -3,6 +3,7 @@
 namespace app\controller;
 
 use bestlang\core\controller\BLController;
+use bestlang\ext\cache\BLCache;
 
 class Test extends BLController
 {
@@ -25,6 +26,17 @@ class Test extends BLController
         $this->session($session_key, $new_value);
         $ret .= 'Set to: ' . $new_value . '<br>';
         $ret .= 'Get again: ' . $this->session($session_key);
+        return $this->html($ret);
+    }
+
+    public function testcache()
+    {
+        $cache_key = 'test_cache';
+        $ret = 'Current value: ' . BLCache::get($cache_key) . '<br>';
+        $new_value = time();
+        BLCache::set($cache_key, $new_value);
+        $ret .= 'Set to: ' . $new_value . '<br>';
+        $ret .= 'Get again: ' . BLCache::get($cache_key);
         return $this->html($ret);
     }
 

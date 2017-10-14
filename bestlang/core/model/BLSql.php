@@ -2,7 +2,7 @@
 
 namespace bestlang\core\model;
 
-use app\config\DBConfig;
+use bestlang\core\BLConfig;
 use bestlang\core\BLLog;
 
 class BLSql
@@ -16,7 +16,11 @@ class BLSql
     public static function getHandle()
     {
         if (!isset(self::$_dbhnd)) {
-            self::$_dbhnd = new \PDO(DBConfig::$dsn, DBConfig::$user, DBConfig::$pass);
+            self::$_dbhnd = new \PDO(
+                BLConfig::get('db', 'dsn'),
+                BLConfig::get('db', 'user'),
+                BLConfig::get('db', 'pass')
+            );
             self::$_dbhnd->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         }
         return self::$_dbhnd;
