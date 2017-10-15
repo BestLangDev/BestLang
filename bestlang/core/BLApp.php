@@ -43,7 +43,7 @@ class BLApp
         if ($result === false) {
             BLLog::log('Cannot find callable for path ' . $_SERVER['REQUEST_URI']);
             http_response_code(404);
-            echo 'Not Found';
+            include 'template/not_found.php';
         }
         // output
         if ($result instanceof BLResponse) {
@@ -52,7 +52,7 @@ class BLApp
             echo $result->getBody();
         } elseif ($result instanceof \Exception) {
             http_response_code(500);
-            var_dump($result);
+            include 'template/exception.php';
         } else {
             echo $result;
         }

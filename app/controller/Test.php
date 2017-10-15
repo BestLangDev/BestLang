@@ -46,4 +46,9 @@ class Test extends BLController
             'a' => 1, 'b' => true, 'c' => 'test'
         ]);
     }
+
+    public function testexception()
+    {
+        throw new \Exception("Test exception");
+    }
 }
