@@ -1,10 +1,10 @@
 <?php
 
-namespace bestlang\core\controller;
+namespace BestLang\core\controller;
 
-use bestlang\core\util\BLCookie;
-use bestlang\core\util\BLResponse;
-use bestlang\core\util\BLSession;
+use BestLang\core\util\BLCookie;
+use BestLang\core\util\BLResponse;
+use BestLang\core\util\BLSession;
 
 class BLController
 {

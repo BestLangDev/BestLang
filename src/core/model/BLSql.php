@@ -1,9 +1,9 @@
 <?php
 
-namespace bestlang\core\model;
+namespace BestLang\core\model;
 
-use bestlang\core\BLConfig;
-use bestlang\core\BLLog;
+use BestLang\core\BLConfig;
+use BestLang\core\BLLog;
 
 class BLSql
 {

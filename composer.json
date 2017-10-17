@@ -15,7 +15,7 @@
   },
   "autoload": {
     "psr-4": {
-      "bestlang\\": "bestlang"
+      "BestLang\\": "src"
     }
   }
 }

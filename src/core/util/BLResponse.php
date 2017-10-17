@@ -1,6 +1,6 @@
 <?php
 
-namespace bestlang\core\util;
+namespace BestLang\core\util;
 
 class BLResponse
 {

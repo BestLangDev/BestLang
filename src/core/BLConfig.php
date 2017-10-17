@@ -1,6 +1,6 @@
 <?php
 
-namespace bestlang\core;
+namespace BestLang\core;
 
 class BLConfig
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace bestlang\ext\cache;
+namespace BestLang\ext\cache;
 
 
-use bestlang\core\BLConfig;
+use BestLang\core\BLConfig;
 
 abstract class BLCache
 {

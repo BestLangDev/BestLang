@@ -1,8 +1,8 @@
 <?php
 
-namespace bestlang\core;
+namespace BestLang\core;
 
-use bestlang\core\util\BLResponse;
+use BestLang\core\util\BLResponse;
 
 /**
  * 应用程序类

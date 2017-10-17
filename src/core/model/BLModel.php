@@ -1,6 +1,6 @@
 <?php
 
-namespace bestlang\core\model;
+namespace BestLang\core\model;
 
 class BLModel
 {

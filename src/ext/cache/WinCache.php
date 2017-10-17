@@ -1,6 +1,6 @@
 <?php
 
-namespace bestlang\ext\cache;
+namespace BestLang\ext\cache;
 
 class WinCache extends BLCache
 {
