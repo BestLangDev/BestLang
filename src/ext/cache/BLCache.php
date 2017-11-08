@@ -70,16 +70,16 @@ abstract class BLCache
         return self::$_handle->hasOne($key);
     }
 
-    public static function set($key, $value = null)
+    public static function set($key, $value = null, $ttl = 0)
     {
         self::checkInit();
 
         if (is_array($key)) {
             foreach ($key as $realKey => $realValue) {
-                self::$_handle->setOne($realKey, $realValue);
+                self::$_handle->setOne($realKey, $realValue, $ttl);
             }
         } else {
-            self::$_handle->setOne($key, $value);
+            self::$_handle->setOne($key, $value, $ttl);
         }
     }
 
