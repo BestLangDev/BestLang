@@ -18,3 +18,4 @@ out/
 # Composer
 composer.lock
 *.phar
+/vendor/

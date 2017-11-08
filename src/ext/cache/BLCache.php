@@ -18,7 +18,8 @@ abstract class BLCache
     abstract function deleteOne($key);
 
     private static $_providers = [
-        WinCache::class
+        WinCache::class,
+        CacheStub::class
     ];
 
     private static $_handle;
