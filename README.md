@@ -10,10 +10,11 @@
 - [x] 请求相关方法 (Post / Session / Cookies ...)
 - [x] 常用数据库 (MySQL / SQLite) 支持
 - [x] 基本 Model 支持
-- [ ] 基本 View 层支持 (集成第三方模板引擎)
-- [ ] 自定义 URL 路由
 - [x] 常用缓存 (Redis / Memcached / WinCache) 支持
-- [ ] 高级 Model 支持 (关联 / 映射 / 聚合 ...)
-- [ ] 日志支持
+- [x] Token 认证支持
 - [x] Composer 支持
 - [x] 404 / 500 提示页
+- [ ] 自定义 URL 路由
+- [ ] 基本 View 层支持 (集成第三方模板引擎)
+- [ ] 日志支持
+- [ ] 高级 Model 支持 (关联 / 映射 / 聚合 ...)

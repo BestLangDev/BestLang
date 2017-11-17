@@ -1,7 +1,6 @@
 {
   "name": "deepaq/bestlang",
   "description": "BestLang: Yet another PHP MVC framework",
-  "version": "1.0.0-dev",
   "homepage": "https://github.com/DeepAQ/BestLang",
   "license": "Apache-2.0",
   "authors": [
