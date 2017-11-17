@@ -173,16 +173,36 @@ class BLModel
 
     private static function getTableInfo()
     {
-        $sql = 'SHOW COLUMNS FROM ' . self::table() . ';';
         static::$fields = [];
         static::$pkField = false;
+        switch (BLSql::dbType()) {
+            case 'sqlite':
+                return self::getTableInfoSQLite();
+            default:
+                return self::getTableInfoGeneric();
+        }
+    }
+
+    private static function getTableInfoGeneric()
+    {
+        $sql = 'SHOW COLUMNS FROM ' . self::table() . ';';
         foreach (BLSql::exec($sql)->fetchAll() as $row) {
             static::$fields[] = strtolower($row['Field']);
             if (strtolower($row['Key']) == 'pri') {
                 static::$pkField = $row['Field'];
             }
         }
-        return static::$fields;
+    }
+
+    private static function getTableInfoSQLite()
+    {
+        $sql = 'PRAGMA table_info(' . self::table() . ');';
+        foreach (BLSql::exec($sql)->fetchAll() as $row) {
+            static::$fields[] = strtolower($row['name']);
+            if ($row['pk'] == 1) {
+                static::$pkField = $row['name'];
+            }
+        }
     }
 
     // ========== 便捷方法 ==========

@@ -40,4 +40,12 @@ class BLSql
         $stmt->execute($params);
         return $stmt;
     }
+
+    public static function dbType()
+    {
+        if (strpos(BLConfig::get('db', 'dsn'), 'sqlite:') === 0) {
+            return 'sqlite';
+        }
+        return '';
+    }
 }
