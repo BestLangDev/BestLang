@@ -96,5 +96,6 @@ class BLQuery
         } else {
             $this->limit = $start . ',' . $end;
         }
+        return $this;
     }
 }

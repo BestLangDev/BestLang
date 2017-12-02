@@ -13,8 +13,7 @@ class BLApp
     public static function start()
     {
         // 定义常量
-        defined('APP_ROOT') or define('APP_ROOT', __DIR__ . '/../../../../app/');
-        define('BL_ROOT', __DIR__ . '/');
+        defined('APP_ROOT') or define('APP_ROOT', __DIR__ . '/../../../../../app/');
         define('APP_CONTROLLER_DIR', APP_ROOT . 'controller/');
         define('APP_MODEL_DIR', APP_ROOT . 'model/');
         define('APP_VIEW_DIR', APP_ROOT . 'view/');

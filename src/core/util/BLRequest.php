@@ -65,6 +65,18 @@ class BLRequest
         return isset($map[$key]) ? $map[$key] : $default;
     }
 
+    public static function bodyJson($key = null, $default = null)
+    {
+        $json = json_decode(self::body(), true);
+        if (is_null($key)) {
+            return $json;
+        }
+        if (!is_array($json)) {
+            return $default;
+        }
+        return self::getOrDefault($json, $key, $default);
+    }
+
     /**
      * @param string $key 参数名
      * @param mixed $default 默认值
