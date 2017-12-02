@@ -2,6 +2,7 @@
 
 namespace BestLang\core;
 
+use BestLang\core\controller\BLInterceptor;
 use BestLang\core\util\BLResponse;
 
 /**
@@ -52,6 +53,16 @@ class BLApp
      */
     private static function route()
     {
+        // Interceptor
+        $interceptor = BLConfig::get('interceptor');
+        if (!empty($interceptor)) {
+            $interceptorClass = self::getClass($interceptor);
+            if (!is_null($interceptorClass) && $interceptorClass->implementsInterface(BLInterceptor::class)) {
+                $interceptor = $interceptorClass->newInstance();
+            }
+            $interceptor->before();
+        }
+
         $path = isset($_SERVER['PATH_INFO']) ? explode('/', trim($_SERVER['PATH_INFO'], '/')) : [];
         BLLog::log(var_export($path, true));
         $size = sizeof($path);
@@ -68,6 +79,11 @@ class BLApp
                 $result = self::tryInvoke($path[$size - 1], DEFAULT_METHOD, join('/', array_slice($path, 0, $size - 1)));
             }
         }
+
+        if (!empty($interceptor)) {
+            $interceptor->after();
+        }
+
         // check again
         if ($result === false) {
             BLLog::log('Cannot find callable for path ' . $_SERVER['REQUEST_URI']);

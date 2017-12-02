@@ -45,14 +45,6 @@ class BLRequest
     }
 
     /**
-     * @return array 全部请求头
-     */
-    public static function headers()
-    {
-        return getallheaders();
-    }
-
-    /**
      * @return mixed 请求体
      */
     public static function body()
@@ -62,6 +54,9 @@ class BLRequest
 
     private static function getOrDefault($map, $key, $default)
     {
+        if (is_null($key)) {
+            return $map;
+        }
         return isset($map[$key]) ? $map[$key] : $default;
     }
 
@@ -77,12 +72,17 @@ class BLRequest
         return self::getOrDefault($json, $key, $default);
     }
 
+    public static function header($key = null, $default = null)
+    {
+        return self::getOrDefault(getallheaders(), $key, $default);
+    }
+
     /**
      * @param string $key 参数名
      * @param mixed $default 默认值
      * @return mixed GET 参数
      */
-    public static function get($key, $default = null)
+    public static function get($key = null, $default = null)
     {
         return self::getOrDefault($_GET, $key, $default);
     }
@@ -92,7 +92,7 @@ class BLRequest
      * @param mixed $default 默认值
      * @return mixed POST 参数
      */
-    public static function post($key, $default = null)
+    public static function post($key = null, $default = null)
     {
         return self::getOrDefault($_POST, $key, $default);
     }
