@@ -133,7 +133,9 @@ class BLModel implements \JsonSerializable
                 $params[] = $value;
             }
             $sql = 'INSERT INTO `' . self::table() . '` (' . join(',', $fields) . ') VALUES (' . join(',', $quests) . ');';
-            BLSql::exec($sql, $params);
+            if (BLSql::exec($sql, $params)->rowCount() <= 0) {
+                return false;
+            }
             $this->_dirty = [];
             // save pk value
             $this->_pkValue = BLSql::getHandle()->lastInsertId(self::pkField());

@@ -51,6 +51,30 @@ class BLQuery
         return $models;
     }
 
+    public function count()
+    {
+        $sql = 'SELECT count(1) FROM `' . $this->table . '`';
+        if (!empty($this->wheres)) {
+            $sql .= ' WHERE ' . join(' AND ', $this->wheres);
+        }
+        if (!empty($this->orders)) {
+            $sql .= ' ORDER BY ' . join(', ', $this->orders);
+        }
+        if (!empty($this->limit)) {
+            $sql .= ' LIMIT ' . $this->limit;
+        }
+        $result = BLSql::exec($sql, $this->params);
+        return $result->fetch(\PDO::FETCH_NUM)[0];
+    }
+
+    public function fields($fields)
+    {
+        if (is_array($fields)) {
+            $this->fields = $fields;
+        }
+        return $this;
+    }
+
     /**
      *    where(field, op, value)
      * OR where(field, value) (default op is "=")

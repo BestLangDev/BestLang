@@ -32,13 +32,17 @@ class JWT extends BLToken
 
     function unsignInternal($token)
     {
-        $parsed = (new Parser())->parse($token);
-        $vd = new ValidationData();
-        $vd->setCurrentTime(time());
-        if (!$parsed->verify($this->getSigner(), BLConfig::get('token', 'options', 'key'))
-            || !$parsed->validate($vd)) {
+        try {
+            $parsed = (new Parser())->parse($token);
+            $vd = new ValidationData();
+            $vd->setCurrentTime(time());
+            if (!$parsed->verify($this->getSigner(), BLConfig::get('token', 'options', 'key'))
+                || !$parsed->validate($vd)) {
+                return false;
+            };
+            return $parsed->getClaim('bl_data', false);
+        } catch (\Exception $e) {
             return false;
-        };
-        return $parsed->getClaim('bl_data', false);
+        }
     }
 }
