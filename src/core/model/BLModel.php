@@ -8,16 +8,19 @@ class BLModel implements \JsonSerializable
      * @var string 表名
      */
     protected static $table;
+    private static $tableMap = [];
 
     /**
      * @var array 表结构
      */
     protected static $fields;
+    private static $fieldsMap = [];
 
     /**
      * @var string 主键列名
      */
     protected static $pkField;
+    private static $pkFieldMap = [];
 
     /**
      * @var array 数据
@@ -84,7 +87,7 @@ class BLModel implements \JsonSerializable
         if (isset($data)) {
             if (is_array($data)) {
                 foreach (self::fields() as $field) {
-                    if (isset($data[$field])) {
+                    if (key_exists($field, $data)) {
                         $this->_data[$field] = $data[$field];
                         if ($setDirty) {
                             $this->_dirty[$field] = true;
@@ -154,11 +157,15 @@ class BLModel implements \JsonSerializable
     public static function fields($custom = null)
     {
         if (is_array($custom)) {
-            static::$fields = $custom;
-        } elseif (!isset(static::$fields)) {
-            self::getTableInfo();
+            self::$fieldsMap[static::class] = $custom;
+        } elseif (!isset(self::$fieldsMap[static::class])) {
+            if (isset(static::$fields)) {
+                self::$fieldsMap[static::class] = static::$fields;
+            } else {
+                self::getTableInfo();
+            }
         }
-        return static::$fields;
+        return self::$fieldsMap[static::class];
     }
 
     /**
@@ -167,10 +174,14 @@ class BLModel implements \JsonSerializable
      */
     private static function table()
     {
-        if (!isset(static::$table)) {
-            static::$table = strtolower((new \ReflectionClass(static::class))->getShortName());
+        if (!isset(self::$tableMap[static::class])) {
+            if (isset(static::$table)) {
+                self::$tableMap[static::class] = static::$table;
+            } else {
+                self::$tableMap[static::class] = strtolower((new \ReflectionClass(static::class))->getShortName());
+            }
         }
-        return static::$table;
+        return self::$tableMap[static::class];
     }
 
     /**
@@ -179,16 +190,20 @@ class BLModel implements \JsonSerializable
      */
     private static function pkField()
     {
-        if (!isset(static::$pkField)) {
-            self::getTableInfo();
+        if (!isset(self::$pkFieldMap[static::class])) {
+            if (isset(static::$pkField)) {
+                self::$pkFieldMap[static::class] = static::$pkField;
+            } else {
+                self::getTableInfo();
+            }
         }
-        return static::$pkField;
+        return self::$pkFieldMap[static::class];
     }
 
     private static function getTableInfo()
     {
-        static::$fields = [];
-        static::$pkField = false;
+        self::$fieldsMap[static::class] = [];
+        self::$pkFieldMap[static::class] = false;
         switch (BLSql::dbType()) {
             case 'sqlite':
                 return self::getTableInfoSQLite();
@@ -201,9 +216,9 @@ class BLModel implements \JsonSerializable
     {
         $sql = 'SHOW COLUMNS FROM ' . self::table() . ';';
         foreach (BLSql::exec($sql)->fetchAll() as $row) {
-            static::$fields[] = strtolower($row['Field']);
+            self::$fieldsMap[static::class][] = strtolower($row['Field']);
             if (strtolower($row['Key']) == 'pri') {
-                static::$pkField = $row['Field'];
+                self::$pkFieldMap[static::class] = $row['Field'];
             }
         }
     }
@@ -212,9 +227,9 @@ class BLModel implements \JsonSerializable
     {
         $sql = 'PRAGMA table_info(' . self::table() . ');';
         foreach (BLSql::exec($sql)->fetchAll() as $row) {
-            static::$fields[] = strtolower($row['name']);
+            self::$fieldsMap[static::class][] = strtolower($row['name']);
             if ($row['pk'] == 1) {
-                static::$pkField = $row['name'];
+                self::$pkFieldMap[static::class] = $row['name'];
             }
         }
     }
