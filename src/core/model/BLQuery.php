@@ -103,6 +103,15 @@ class BLQuery
         return $this;
     }
 
+    public function whereRaw($raw, $params = [])
+    {
+        $this->wheres[] = $raw;
+        foreach ($params as $param) {
+            $this->params[] = $param;
+        }
+        return $this;
+    }
+
     /**
      * @param $order
      * @return $this

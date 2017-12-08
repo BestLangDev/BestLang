@@ -147,6 +147,21 @@ class BLModel implements \JsonSerializable
         }
     }
 
+    /**
+     * 从数据库中删除此模型
+     * @return bool
+     */
+    public function remove()
+    {
+        if (!isset($this->_pkValue)) {
+            return false;
+        }
+        if (self::delete($this->_pkValue) > 0) {
+            return true;
+        }
+        return false;
+    }
+
     // ========== 表信息相关方法 ==========
 
     /**
@@ -243,7 +258,11 @@ class BLModel implements \JsonSerializable
         }
         $sql = 'SELECT ' . join(',', self::fields()) . ' FROM `' . self::table() . '` WHERE `' . self::pkField() . '`=?;';
         $result = BLSql::exec($sql, [$pk]);
-        return new static($result->fetch(\PDO::FETCH_ASSOC), true);
+        $data = $result->fetch(\PDO::FETCH_ASSOC);
+        if ($data === false) {
+            return false;
+        }
+        return new static($data, true);
     }
 
     public static function all()
