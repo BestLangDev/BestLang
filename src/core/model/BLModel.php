@@ -157,6 +157,7 @@ class BLModel implements \JsonSerializable
             return false;
         }
         if (self::delete($this->_pkValue) > 0) {
+            $this->_pkValue = null;
             return true;
         }
         return false;
