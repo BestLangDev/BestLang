@@ -5,6 +5,7 @@ namespace BestLang\core\controller;
 use BestLang\core\util\BLCookie;
 use BestLang\core\util\BLResponse;
 use BestLang\core\util\BLSession;
+use BestLang\core\view\BLView;
 
 class BLController
 {
@@ -24,6 +25,11 @@ class BLController
     protected function json($object)
     {
         return new BLResponse(200, 'application/json', json_encode($object, JSON_UNESCAPED_UNICODE));
+    }
+
+    protected function view($template, $data = [])
+    {
+        return new BLResponse(200, 'text/html', BLView::render($template, $data));
     }
 
     // Cookie & Session

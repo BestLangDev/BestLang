@@ -18,6 +18,7 @@ class BLApp
         define('APP_CONTROLLER_DIR', APP_ROOT . 'controller/');
         define('APP_MODEL_DIR', APP_ROOT . 'model/');
         define('APP_VIEW_DIR', APP_ROOT . 'view/');
+        define('APP_CACHE_DIR', APP_ROOT . 'cache/');
         define('DEFAULT_CONTROLLER', 'main');
         define('DEFAULT_METHOD', 'index');
 
